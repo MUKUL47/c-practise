@@ -5,12 +5,15 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_ttf.h>
+#define WIN_HEIGHT 800
+#define WIN_WIDTH 800
 
 #define BUTTON_PANEL_LENGTH 2
 #define BUTTON_PANEL_LABELS                                                    \
-  { "Square", "Select" }
+  { "Square", "Select", }
 typedef enum { NONE, MOUSE_DOWN, MOUSE_UP } MouseMovement;
 typedef enum { SQUARE_QUAD } SUPPORTED_QUAD_TYPES;
+typedef enum { BUTTON_PANEL_QUAD, BUTTON_PANEL_SELECT } BUTTON_PANEL_TYPES;
 /////////////
 
 typedef struct {

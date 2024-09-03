@@ -5,6 +5,7 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <assert.h>
+#define PANEL_OVERFLOW 10
 void on_mouse_update_button_panel(GameInstance *gi, MyState *s,
                                   SDL_Event *event) {
   if (event->type == SDL_MOUSEBUTTONDOWN) {
@@ -21,6 +22,7 @@ void on_mouse_update_button_panel(GameInstance *gi, MyState *s,
             mouseY <= bp.position.y + bp.dimension.y) {
           s->panel.active_panel_id =
               s->panel.active_panel_id == bp.id ? 0 : bp.id;
+          invoke_event_cb(gi, s, ENTITY_EVENT_BUTTON_CLICK, NULL);
           break;
         }
       }
@@ -51,14 +53,26 @@ ButtonPanel *create_new_panel(GameInstance *gi, MyState *s, char *name,
   if (fi == NULL) {
     return NULL;
   }
-  ButtonPanel *bp = malloc(sizeof(ButtonPanel));
+  ButtonPanel *bp = alloc(sizeof(ButtonPanel));
   bp->sdl_surface = fi->textSurface;
   bp->sdl_texture = fi->textTexture;
   bp->dimension.x = fi->textSurface->w;
-  bp->dimension.y = fi->textSurface->h; // TODO handle overflow
-  bp->position.x =
-      !index ? 0 : s->panel.button_panel[index - 1].dimension.x + 10;
+  bp->dimension.y = fi->textSurface->h;
+  bp->position.x = 0;
   bp->position.y = 0;
+  if (index > 0) {
+    ButtonPanel last_panel = s->panel.button_panel[index - 1];
+    bp->position.x =
+        last_panel.position.x + last_panel.dimension.x + PANEL_OVERFLOW;
+    if (last_panel.position.x + last_panel.dimension.x + PANEL_OVERFLOW +
+            fi->textSurface->w + bp->position.x >
+        WIN_WIDTH) {
+
+      bp->position.y =
+          last_panel.position.y + fi->textSurface->h + PANEL_OVERFLOW;
+      bp->position.x = 0;
+    }
+  }
   bp->id = index + 1;
   return bp;
 }
@@ -84,7 +98,7 @@ void button_panel_destroy(MyState *s) {
 }
 Entity *button_panel_entity() {
   Entity *e = NULL;
-  e = malloc(sizeof(Entity));
+  e = alloc(sizeof(Entity));
   e->on_mouse_update = on_mouse_update_button_panel;
   e->on_entity_init = button_panel_init;
   e->on_entity_render = on_entity_render_button_panel;

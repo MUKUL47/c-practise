@@ -41,7 +41,17 @@ void on_entity_render_square(SDL_Renderer *renderer, MyState *s) {
     SDL_RenderDrawRect(renderer, quad->rect);
   }
 }
+void entity_event_cb_quad_square_entity(char *k, GameInstance *gi,
+                                        MyState *state, void *g) {
+  ENTITY_EVENT_TYPES e = event_type_from_char(k);
+  if (e == ENTITY_EVENT_DELETE_QUAD && g != NULL) {
+    delete_arr(state->squares, *((int *)g));
+  }
+}
+
 void square_entity_init(GameInstance *gi, MyState *state) {
+  register_event_cb(gi, ENTITY_EVENT_DELETE_QUAD,
+                    entity_event_cb_quad_square_entity);
   state->squares = NULL;
   state->squares = new_array();
 }
@@ -57,7 +67,7 @@ void square_entity_destroy(MyState *s) {
 }
 Entity *square_entity_new() {
   Entity *e = NULL;
-  e = malloc(sizeof(Entity));
+  e = alloc(sizeof(Entity));
   e->on_mouse_update = on_mouse_update_square;
   e->on_entity_init = square_entity_init;
   e->on_entity_render = on_entity_render_square;

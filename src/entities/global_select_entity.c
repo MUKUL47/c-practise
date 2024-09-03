@@ -2,9 +2,6 @@
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_rect.h>
 void on_mouse_update_select(GameInstance *gi, MyState *s, SDL_Event *event) {
-  // if (s->panel.active_panel_id > 0) {
-  //   return;
-  // }
   SelectState *select_state = &s->select_state;
   Coordinate *active_coordinate = &s->select_state.active_coordinate;
   MouseMovement *mouse_movement = &s->select_state.mouse_movement;
@@ -25,6 +22,9 @@ void on_mouse_update_select(GameInstance *gi, MyState *s, SDL_Event *event) {
 }
 
 void on_entity_render_select(SDL_Renderer *renderer, MyState *s) {
+  if (s->panel.active_panel_id == 2) {
+    return;
+  }
   SelectState *select_state = &s->select_state;
   Coordinate *active_coordinate = &s->select_state.active_coordinate;
   MouseMovement *mouse_movement = &s->select_state.mouse_movement;
@@ -43,7 +43,7 @@ void on_entity_render_select(SDL_Renderer *renderer, MyState *s) {
 void mock_init(GameInstance *gi, MyState *state) {}
 Entity *global_select_entity_new() {
   Entity *e = NULL;
-  e = malloc(sizeof(Entity));
+  e = alloc(sizeof(Entity));
   e->on_mouse_update = on_mouse_update_select;
   e->on_entity_init = mock_init;
   e->on_entity_render = on_entity_render_select;

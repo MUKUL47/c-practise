@@ -7,6 +7,8 @@ const char *char_from_event_type(ENTITY_EVENT_TYPES e) {
   switch (e) {
   case ENTITY_EVENT_BUTTON_CLICK:
     return "ENTITY_EVENT_BUTTON_CLICK";
+  case ENTITY_EVENT_DELETE_QUAD:
+    return "ENTITY_EVENT_DELETE_QUAD";
   default:
     return "ENTITY_EVENT_UNKNOWN";
   }
@@ -16,13 +18,15 @@ ENTITY_EVENT_TYPES event_type_from_char(const char *e) {
   if (strcmp(e, "ENTITY_EVENT_BUTTON_CLICK") == 0) {
     return ENTITY_EVENT_BUTTON_CLICK;
   }
+  else if (strcmp(e, "ENTITY_EVENT_DELETE_QUAD") == 0) {
+    return ENTITY_EVENT_DELETE_QUAD;
+  }
   return ENTITY_EVENT_UNKNOWN;
 }
 
 GameInstance *new_game() {
   GameInstance *gi = NULL;
-  gi = malloc(sizeof(GameInstance));
-  assert(gi != NULL);
+  gi = alloc(sizeof(GameInstance));
   gi->entities = new_array();
   gi->events = hm_new(NULL);
   return gi;
@@ -66,9 +70,10 @@ void entity_on_destroy(GameInstance *gi, MyState *state) {
       e->on_entity_destroy(state);
     }
   }
+  _free(gi->entities);
 }
 
-void create_event_cb(GameInstance *gi, ENTITY_EVENT_TYPES e) {
+void create_event(GameInstance *gi, ENTITY_EVENT_TYPES e) {
   char *event_name = strdup(char_from_event_type(e));
   hm_insert(gi->events, event_name, new_array(), event_name);
 }
@@ -84,7 +89,8 @@ void register_event_cb(GameInstance *gi, ENTITY_EVENT_TYPES e,
   hm_insert(gi->events, event_name, arr, event_name);
 }
 
-void invoke_event_cb(GameInstance *gi, ENTITY_EVENT_TYPES e) {
+void invoke_event_cb(GameInstance *gi, MyState *s, ENTITY_EVENT_TYPES e,
+                     void *generic) {
   char *event_name = strdup(char_from_event_type(e));
   if (!hm_has_key(gi->events, event_name)) {
     return;
@@ -93,6 +99,6 @@ void invoke_event_cb(GameInstance *gi, ENTITY_EVENT_TYPES e) {
   for (int i = 0; i < arr->size; i++) {
     register_event_cb_entity *cb =
         (register_event_cb_entity *)(get_arr(arr, i)->value);
-    (*cb)(event_name);
+    (*cb)(event_name, gi, s, generic);
   }
 }
