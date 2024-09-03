@@ -78,8 +78,9 @@ void button_panel_init(GameInstance *gi, MyState *s) {
   }
 }
 void button_panel_destroy(MyState *s) {
-  SDL_DestroyTexture(s->panel.button_panel[0].sdl_texture);
-  SDL_DestroyTexture(s->panel.button_panel[1].sdl_texture);
+  for (int i = 0; i < BUTTON_PANEL_LENGTH; i++) {
+    SDL_DestroyTexture(s->panel.button_panel[i].sdl_texture);
+  }
 }
 Entity *button_panel_entity() {
   Entity *e = NULL;

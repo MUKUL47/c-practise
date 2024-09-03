@@ -14,26 +14,46 @@ void on_mouse_update_square(GameInstance *gi, MyState *s, SDL_Event *event) {
 
   if (event->button.button == 1) {
     if (event->type == SDL_MOUSEBUTTONUP) {
-      SDL_Rect *active_select = malloc(sizeof(SDL_Rect));
-      active_select->x = start_coordinate->x;
-      active_select->y = start_coordinate->y;
-      active_select->w = active_coordinate->x - start_coordinate->x;
-      active_select->h = active_coordinate->y - start_coordinate->y;
-      push_back(s->squares, active_select, sizeof(SDL_Rect), "");
+      Square *sq = alloc(sizeof(Square));
+      sq->rect = alloc(sizeof(SDL_Rect));
+      sq->id = s->squares->size + 1;
+      if (active_coordinate->y < s->panel.panel_max_height) {
+        return;
+      }
+      sq->rect->x = start_coordinate->x;
+      sq->rect->y = start_coordinate->y;
+      sq->rect->w = active_coordinate->x - start_coordinate->x;
+      sq->rect->h = active_coordinate->y - start_coordinate->y;
+      push_back(s->squares, sq, sizeof(Square), "");
     }
   }
 }
 
 void on_entity_render_square(SDL_Renderer *renderer, MyState *s) {
+  MyArray *arr = s->squares;
   for (int i = 0; i < s->squares->size; i++) {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 200, 255);
-    SDL_RenderDrawRect(renderer, (SDL_Rect *)get_arr(s->squares, i)->value);
+    Square *quad = (Square *)get_arr(arr, i)->value;
+    if (s->active_selected_quad == quad->id) {
+      SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    } else {
+      SDL_SetRenderDrawColor(renderer, 0, 0, 200, 255);
+    }
+    SDL_RenderDrawRect(renderer, quad->rect);
   }
 }
 void square_entity_init(GameInstance *gi, MyState *state) {
   state->squares = NULL;
   state->squares = new_array();
-  assert(state->squares != NULL);
+}
+
+void square_entity_destroy(MyState *s) {
+  if (s->squares != NULL) {
+    for (int i = 0; i < s->squares->size; i++) {
+      Square *quad = get_arr(s->squares, i)->value;
+      _free(quad->rect);
+    }
+    arr_destroy(s->squares);
+  }
 }
 Entity *square_entity_new() {
   Entity *e = NULL;
@@ -41,6 +61,6 @@ Entity *square_entity_new() {
   e->on_mouse_update = on_mouse_update_square;
   e->on_entity_init = square_entity_init;
   e->on_entity_render = on_entity_render_square;
-  e->on_entity_destroy = NULL;
+  e->on_entity_destroy = square_entity_destroy;
   return e;
 }

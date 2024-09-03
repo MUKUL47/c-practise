@@ -15,7 +15,7 @@ SDL_Window *init_window() {
   // Create a window
   SDL_Window *window =
       SDL_CreateWindow("SDL2 Red Rectangle", SDL_WINDOWPOS_CENTERED,
-                       SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN);
+                       SDL_WINDOWPOS_CENTERED, 800, 800, SDL_WINDOW_SHOWN);
   if (!window) {
     fprintf(stderr, "Error creating window: %s\n", SDL_GetError());
     SDL_Quit();
@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
   add_entity(gi, button_panel_entity());
   add_entity(gi, square_entity_new());
   add_entity(gi, global_select_entity_new());
+  add_entity(gi, quad_select_entity_new());
   create_event_cb(gi, ENTITY_EVENT_BUTTON_CLICK);
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());

@@ -31,6 +31,7 @@ void entity_on_destroy(GameInstance *gi, MyState *state);
 Entity *button_panel_entity();
 Entity *global_select_entity_new();
 Entity *square_entity_new();
+Entity *quad_select_entity_new();
 
 // event types
 typedef enum {

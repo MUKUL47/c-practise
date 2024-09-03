@@ -10,6 +10,7 @@
 #define BUTTON_PANEL_LABELS                                                    \
   { "Square", "Select" }
 typedef enum { NONE, MOUSE_DOWN, MOUSE_UP } MouseMovement;
+typedef enum { SQUARE_QUAD } SUPPORTED_QUAD_TYPES;
 /////////////
 
 typedef struct {
@@ -44,7 +45,6 @@ typedef struct {
 
 /////////////
 
-
 typedef struct {
   Coordinate position;
   Coordinate dimension;
@@ -65,4 +65,5 @@ typedef struct {
   Panel panel;
   SDLInstance sdl_instance;
   MyArray *squares;
+  int active_selected_quad;
 } MyState;
