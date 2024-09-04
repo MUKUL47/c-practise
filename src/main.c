@@ -57,8 +57,10 @@ int main(int argc, char *argv[]) {
   add_entity(gi, square_entity_new());
   add_entity(gi, global_select_entity_new());
   add_entity(gi, quad_select_entity_new());
+  add_entity(gi, keyboard_event_listener_entity_new());
   create_event(gi, ENTITY_EVENT_BUTTON_CLICK);
   create_event(gi, ENTITY_EVENT_DELETE_QUAD);
+  create_event(gi, ENTITY_EVENT_ON_KEYSTROKE);
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
     return 1;

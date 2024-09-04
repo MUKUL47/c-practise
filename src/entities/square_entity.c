@@ -1,6 +1,7 @@
 #include "entity.h"
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_render.h>
 #include <assert.h>
 void on_mouse_update_square(GameInstance *gi, MyState *s, SDL_Event *event) {
   if (s->panel.active_panel_id != 1) {
@@ -46,11 +47,15 @@ void entity_event_cb_quad_square_entity(char *k, GameInstance *gi,
   ENTITY_EVENT_TYPES e = event_type_from_char(k);
   if (e == ENTITY_EVENT_DELETE_QUAD && g != NULL) {
     delete_arr(state->squares, *((int *)g));
+  } else if (e == ENTITY_EVENT_ON_KEYSTROKE && g != NULL) {
+    printf("%d\n", (int)(*(SDL_Keycode *)g));
   }
 }
 
 void square_entity_init(GameInstance *gi, MyState *state) {
   register_event_cb(gi, ENTITY_EVENT_DELETE_QUAD,
+                    entity_event_cb_quad_square_entity);
+  register_event_cb(gi, ENTITY_EVENT_ON_KEYSTROKE,
                     entity_event_cb_quad_square_entity);
   state->squares = NULL;
   state->squares = new_array();

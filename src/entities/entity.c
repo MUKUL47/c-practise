@@ -9,6 +9,8 @@ const char *char_from_event_type(ENTITY_EVENT_TYPES e) {
     return "ENTITY_EVENT_BUTTON_CLICK";
   case ENTITY_EVENT_DELETE_QUAD:
     return "ENTITY_EVENT_DELETE_QUAD";
+  case ENTITY_EVENT_ON_KEYSTROKE:
+    return "ENTITY_EVENT_ON_KEYSTROKE";
   default:
     return "ENTITY_EVENT_UNKNOWN";
   }
@@ -17,9 +19,10 @@ const char *char_from_event_type(ENTITY_EVENT_TYPES e) {
 ENTITY_EVENT_TYPES event_type_from_char(const char *e) {
   if (strcmp(e, "ENTITY_EVENT_BUTTON_CLICK") == 0) {
     return ENTITY_EVENT_BUTTON_CLICK;
-  }
-  else if (strcmp(e, "ENTITY_EVENT_DELETE_QUAD") == 0) {
+  } else if (strcmp(e, "ENTITY_EVENT_DELETE_QUAD") == 0) {
     return ENTITY_EVENT_DELETE_QUAD;
+  } else if (strcmp(e, "ENTITY_EVENT_ON_KEYSTROKE") == 0) {
+    return ENTITY_EVENT_ON_KEYSTROKE;
   }
   return ENTITY_EVENT_UNKNOWN;
 }

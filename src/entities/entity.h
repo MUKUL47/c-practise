@@ -32,10 +32,12 @@ Entity *button_panel_entity();
 Entity *global_select_entity_new();
 Entity *square_entity_new();
 Entity *quad_select_entity_new();
+Entity *keyboard_event_listener_entity_new();
 
 // event types
 typedef enum {
   ENTITY_EVENT_BUTTON_CLICK,
+  ENTITY_EVENT_ON_KEYSTROKE,
   ENTITY_EVENT_DELETE_QUAD,
   ENTITY_EVENT_UNKNOWN
 } ENTITY_EVENT_TYPES;
