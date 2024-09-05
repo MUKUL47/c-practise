@@ -13,9 +13,9 @@
 #define FONT_PATH "/home/mukul/mukul/sdl/build/Roboto-Black.ttf"
 SDL_Window *init_window() {
   // Create a window
-  SDL_Window *window =
-      SDL_CreateWindow("SDL2 Red Rectangle", SDL_WINDOWPOS_CENTERED,
-                       SDL_WINDOWPOS_CENTERED, WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_SHOWN);
+  SDL_Window *window = SDL_CreateWindow(
+      "SDL2 Red Rectangle", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_SHOWN);
   if (!window) {
     fprintf(stderr, "Error creating window: %s\n", SDL_GetError());
     SDL_Quit();
@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
   create_event(gi, ENTITY_EVENT_BUTTON_CLICK);
   create_event(gi, ENTITY_EVENT_DELETE_QUAD);
   create_event(gi, ENTITY_EVENT_ON_KEYSTROKE);
+  create_event(gi, ENTITY_EVENT_QUAD_POSITION_UPDATE);
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
     return 1;
