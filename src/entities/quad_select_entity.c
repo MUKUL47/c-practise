@@ -17,7 +17,7 @@ void on_mouse_update_quad_select_entity(GameInstance *gi, MyState *s,
     for (int i = s->squares->size - 1; i > -1; i--) {
       Square *sq = (Square *)get_arr(s->squares, i)->value;
       SDL_Rect *quad = (SDL_Rect *)sq->rect;
-      ButtonPanel bp = s->panel.button_panel[i];
+      TextPanel bp = s->panel.button_panel[i];
       SDL_Surface *surface = bp.sdl_surface;
       SDL_Texture *texture = bp.sdl_texture;
       if (mouseX >= quad->x && mouseX <= quad->x + quad->w &&
@@ -43,6 +43,8 @@ void on_mouse_update_quad_select_entity(GameInstance *gi, MyState *s,
       Coordinate *active_coordinate = &s->select_state.active_coordinate;
       sq->rect->x = active_coordinate->x;
       sq->rect->y = active_coordinate->y;
+      sq->text_panel->position.x = sq->rect->x;
+      sq->text_panel->position.y = sq->rect->y;
     }
   }
 }

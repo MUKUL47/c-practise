@@ -31,9 +31,8 @@ typedef struct {
   Coordinate dimension;
   SDL_Surface *sdl_surface;
   SDL_Texture *sdl_texture;
-  char *name;
   int id;
-} ButtonPanel;
+} TextPanel;
 
 typedef enum {
   PanelActionSquare,
@@ -42,7 +41,7 @@ typedef enum {
 } PanelActiveAction;
 
 typedef struct {
-  ButtonPanel button_panel[BUTTON_PANEL_LENGTH];
+  TextPanel button_panel[BUTTON_PANEL_LENGTH];
   int active_panel_id;
   int panel_max_height;
 } Panel;
@@ -55,6 +54,7 @@ typedef struct {
   int id;
   SDL_Rect *rect;
   char *description;
+  TextPanel *text_panel;
 } Square;
 
 ////

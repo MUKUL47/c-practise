@@ -30,6 +30,8 @@ void on_mouse_update_square(GameInstance *gi, MyState *s, SDL_Event *event) {
     if (event->type == SDL_MOUSEBUTTONUP) {
       Square *sq = alloc(sizeof(Square));
       sq->description = NULL;
+      sq->text_panel = new_text_panel_instance(
+          s, 1, new_font_instance(s, " ", new_rgba(0, 255, 0, 255)));
       sq->rect = alloc(sizeof(SDL_Rect));
       sq->id = s->squares->size + 1;
       if (active_coordinate->y < s->panel.panel_max_height) {
@@ -54,21 +56,34 @@ void on_entity_render_square(SDL_Renderer *renderer, MyState *s) {
       SDL_SetRenderDrawColor(renderer, 0, 0, 200, 255);
     }
     SDL_RenderDrawRect(renderer, quad->rect);
+    if(!is_allocated(quad->text_panel->sdl_surface)){
+      continue;
+    }
+    SDL_Texture *texture = quad->text_panel->sdl_texture;
+    SDL_Rect renderQuad = {
+        quad->text_panel->position.x, quad->text_panel->position.y,
+        quad->text_panel->dimension.x, quad->text_panel->dimension.y};
+    SDL_RenderCopy(renderer, texture, NULL, &renderQuad);
   }
 }
 void entity_event_cb_quad_square_entity(char *k, GameInstance *gi,
                                         MyState *state, void *g) {
   ENTITY_EVENT_TYPES e = event_type_from_char(k);
   if (e == ENTITY_EVENT_DELETE_QUAD && g != NULL) {
-    delete_arr(state->squares, *((int *)g));
+    delete_arr(state->squares, *((int *)g)); //bug
   } else if (e == ENTITY_EVENT_ON_KEYSTROKE && g != NULL) {
-    char k = (char)(*(SDL_Keycode *)g);
     Square *active_quad = get_active_quad(state);
-    bool is_backspace = (int)k == KEYSTROKE_BACKSPACE;
-    if (active_quad == NULL) {
+    if (!is_allocated(active_quad)) {
       return;
     }
-    update_keystroke(&k, active_quad->description);
+    update_keystroke((char *)((SDL_Keycode *)g), &active_quad->description);
+    free_text_panel(active_quad->text_panel);
+    active_quad->text_panel = new_text_panel_instance(
+        state, 1,
+        new_font_instance(state, active_quad->description,
+                          new_rgba(0, 255, 255, 255)));
+    active_quad->text_panel->position.x = active_quad->rect->x;
+    active_quad->text_panel->position.y = active_quad->rect->y;
   }
 }
 
@@ -86,6 +101,8 @@ void square_entity_destroy(MyState *s) {
     for (int i = 0; i < s->squares->size; i++) {
       Square *quad = get_arr(s->squares, i)->value;
       _free(quad->rect);
+      _free(quad->description);
+      free_text_panel(quad->text_panel);
     }
     arr_destroy(s->squares);
   }

@@ -29,3 +29,4 @@ void hm_resize(HashMap *old_map);
 void hm_insert(HashMap *hm, char *k, void *value, char *purpose);
 bool hm_has_key(HashMap *hm, char *k);
 struct Map *hm_get(HashMap *hm, char *k);
+void hm_destroy(HashMap *hm);

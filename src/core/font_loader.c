@@ -18,7 +18,6 @@ FontInstance *load_text(SDLInstance *sdl_instance, char *text, RGBA rgba) {
            SDL_GetError());
     return NULL;
   }
-  SDL_FreeSurface(textSurface);
   FontInstance *fi = NULL;
   fi = alloc(sizeof(FontInstance));
   fi->textSurface = textSurface;
