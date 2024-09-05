@@ -7,6 +7,7 @@
 #include <SDL2/SDL_ttf.h>
 #define WIN_HEIGHT 800
 #define WIN_WIDTH 800
+#define KEYSTROKE_BACKSPACE 8
 
 #define BUTTON_PANEL_LENGTH 2
 #define BUTTON_PANEL_LABELS                                                    \
@@ -53,6 +54,7 @@ typedef struct {
   Coordinate dimension;
   int id;
   SDL_Rect *rect;
+  char *description;
 } Square;
 
 ////

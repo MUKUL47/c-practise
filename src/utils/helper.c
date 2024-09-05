@@ -20,3 +20,10 @@ void _free(void *p) {
     free(p);
   }
 }
+
+void *alloc_r(void *p, size_t new_size){
+  void *t = NULL;
+  t = realloc(p, new_size);
+  assert(t != NULL);
+  p = t;
+}

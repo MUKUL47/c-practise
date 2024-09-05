@@ -1,8 +1,21 @@
-#include "entity.h"
+#include "object_entity.h"
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 #include <assert.h>
+#include <string.h>
+
+Square *get_active_quad(MyState *s) {
+  MyArray *arr = s->squares;
+  for (int i = 0; i < s->squares->size; i++) {
+    Square *quad = (Square *)get_arr(arr, i)->value;
+    if (s->active_selected_quad == quad->id) {
+      return quad;
+    }
+  }
+  return NULL;
+}
+
 void on_mouse_update_square(GameInstance *gi, MyState *s, SDL_Event *event) {
   if (s->panel.active_panel_id != 1) {
     return;
@@ -16,6 +29,7 @@ void on_mouse_update_square(GameInstance *gi, MyState *s, SDL_Event *event) {
   if (event->button.button == 1) {
     if (event->type == SDL_MOUSEBUTTONUP) {
       Square *sq = alloc(sizeof(Square));
+      sq->description = NULL;
       sq->rect = alloc(sizeof(SDL_Rect));
       sq->id = s->squares->size + 1;
       if (active_coordinate->y < s->panel.panel_max_height) {
@@ -48,7 +62,13 @@ void entity_event_cb_quad_square_entity(char *k, GameInstance *gi,
   if (e == ENTITY_EVENT_DELETE_QUAD && g != NULL) {
     delete_arr(state->squares, *((int *)g));
   } else if (e == ENTITY_EVENT_ON_KEYSTROKE && g != NULL) {
-    printf("%d\n", (int)(*(SDL_Keycode *)g));
+    char k = (char)(*(SDL_Keycode *)g);
+    Square *active_quad = get_active_quad(state);
+    bool is_backspace = (int)k == KEYSTROKE_BACKSPACE;
+    if (active_quad == NULL) {
+      return;
+    }
+    update_keystroke(&k, active_quad->description);
   }
 }
 
