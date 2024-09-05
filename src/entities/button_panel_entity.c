@@ -1,5 +1,4 @@
-#include "../core/font_loader.h"
-#include "entity.h"
+#include "object_entity.h"
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
@@ -13,7 +12,7 @@ void on_mouse_update_button_panel(GameInstance *gi, MyState *s,
       int mouseX = event->button.x;
       int mouseY = event->button.y;
       for (int i = 0; i < BUTTON_PANEL_LENGTH; i++) {
-        ButtonPanel bp = s->panel.button_panel[i];
+        TextPanel bp = s->panel.button_panel[i];
         SDL_Surface *surface = bp.sdl_surface;
         SDL_Texture *texture = bp.sdl_texture;
         if (mouseX >= bp.position.x &&
@@ -32,8 +31,7 @@ void on_mouse_update_button_panel(GameInstance *gi, MyState *s,
 
 void on_entity_render_button_panel(SDL_Renderer *renderer, MyState *s) {
   for (int i = 0; i < BUTTON_PANEL_LENGTH; i++) {
-    ButtonPanel bp = s->panel.button_panel[i];
-    SDL_Surface *surface = bp.sdl_surface;
+    TextPanel bp = s->panel.button_panel[i];
     SDL_Texture *texture = bp.sdl_texture;
     SDL_Rect renderQuad = {bp.position.x, bp.position.y, bp.dimension.x,
                            bp.dimension.y};
@@ -46,22 +44,45 @@ void on_entity_render_button_panel(SDL_Renderer *renderer, MyState *s) {
   }
 }
 
-ButtonPanel *create_new_panel(GameInstance *gi, MyState *s, char *name,
-                              int index) {
-  RGBA rgba = {255, 255, 255, 255};
-  FontInstance *fi = load_text(&s->sdl_instance, name, rgba);
+void free_text_panel(TextPanel *tp) {
+  // _free(tp->sdl_texture);
+  // _free(tp->sdl_surface);
+  // _free(tp->name);
+}
+
+FontInstance *new_font_instance(MyState *s, char *text_content, RGBA rgba) {
+  FontInstance *fi = load_text(&s->sdl_instance, text_content, rgba);
   if (fi == NULL) {
     return NULL;
   }
-  ButtonPanel *bp = alloc(sizeof(ButtonPanel));
+  return fi;
+}
+
+TextPanel *new_text_panel_instance(MyState *s, int id, FontInstance *fi) {
+  if (fi == NULL) {
+    return NULL;
+  }
+  TextPanel *bp = alloc(sizeof(TextPanel));
   bp->sdl_surface = fi->textSurface;
   bp->sdl_texture = fi->textTexture;
   bp->dimension.x = fi->textSurface->w;
   bp->dimension.y = fi->textSurface->h;
   bp->position.x = 0;
   bp->position.y = 0;
+  bp->id = id;
+  return bp;
+}
+
+TextPanel *create_new_panel(GameInstance *gi, MyState *s, char *name,
+                            int index) {
+  RGBA rgba = {255, 255, 255, 255};
+  FontInstance *fi = new_font_instance(s, name, rgba);
+  TextPanel *bp = new_text_panel_instance(s, index + 1, fi);
+  if (bp == NULL) {
+    return NULL;
+  }
   if (index > 0) {
-    ButtonPanel last_panel = s->panel.button_panel[index - 1];
+    TextPanel last_panel = s->panel.button_panel[index - 1];
     bp->position.x =
         last_panel.position.x + last_panel.dimension.x + PANEL_OVERFLOW;
     if (last_panel.position.x + last_panel.dimension.x + PANEL_OVERFLOW +
@@ -73,7 +94,6 @@ ButtonPanel *create_new_panel(GameInstance *gi, MyState *s, char *name,
       bp->position.x = 0;
     }
   }
-  bp->id = index + 1;
   return bp;
 }
 
@@ -82,7 +102,7 @@ void button_panel_init(GameInstance *gi, MyState *s) {
   s->panel.panel_max_height = 0;
   char *labels[] = BUTTON_PANEL_LABELS;
   for (int i = 0; i < BUTTON_PANEL_LENGTH; i++) {
-    ButtonPanel *sq = create_new_panel(gi, s, labels[i], i);
+    TextPanel *sq = create_new_panel(gi, s, labels[i], i);
     if (sq != NULL) {
       s->panel.button_panel[i] = *sq;
       int c = sq->position.y + sq->dimension.y;
