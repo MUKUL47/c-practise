@@ -45,9 +45,14 @@ void on_entity_render_button_panel(SDL_Renderer *renderer, MyState *s) {
 }
 
 void free_text_panel(TextPanel *tp) {
-  // _free(tp->sdl_texture);
-  // _free(tp->sdl_surface);
-  // _free(tp->name);
+  if (is_allocated(tp->sdl_surface)) {
+    SDL_FreeSurface(tp->sdl_surface);
+    tp->sdl_surface = NULL;
+  }
+  if (is_allocated(tp->sdl_texture)) {
+    SDL_DestroyTexture(tp->sdl_texture);
+    tp->sdl_texture = NULL;
+  }
 }
 
 FontInstance *new_font_instance(MyState *s, char *text_content, RGBA rgba) {

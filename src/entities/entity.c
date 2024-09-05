@@ -73,7 +73,10 @@ void entity_on_destroy(GameInstance *gi, MyState *state) {
       e->on_entity_destroy(state);
     }
   }
-  _free(gi->entities);
+  arr_destroy(gi->entities);
+  hm_destroy(gi->events);
+  gi->entities = NULL;
+  gi->events = NULL;
 }
 
 void create_event(GameInstance *gi, ENTITY_EVENT_TYPES e) {

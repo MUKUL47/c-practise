@@ -1,4 +1,5 @@
 #include "hm.h"
+#include <time.h>
 void hm_free(void *p) {
   if (p != NULL) {
     free(p);
@@ -161,6 +162,28 @@ void hm_resize(HashMap *old_map) {
     }
   }
   *old_map = *hm_new;
+}
+
+void hm_destroy(HashMap *hm) {
+  if (hm == NULL) {
+    return;
+  }
+  for (int i = 0; i < hm->current_size; i++) {
+    if (hm->maps[i] != NULL) {
+      struct Map *h = hm->maps[i];
+      while (h != NULL) {
+        struct Map *map = h;
+        h = h->next;
+        hm_free(map->key);
+        hm_free(map->purpose);
+        hm_free(map->value);
+        hm_free(map);
+      }
+    }
+  }
+  hm_free(hm->custom_hash_cb);
+  hm_free(hm->maps);
+  hm_free(hm);
 }
 
 void hm_insert(HashMap *hm, char *k, void *value, char *purpose) {

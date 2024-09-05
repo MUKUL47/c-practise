@@ -31,7 +31,6 @@ typedef struct {
   Coordinate dimension;
   SDL_Surface *sdl_surface;
   SDL_Texture *sdl_texture;
-  char *name;
   int id;
 } TextPanel;
 
