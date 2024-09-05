@@ -78,6 +78,26 @@ TextPanel *new_text_panel_instance(MyState *s, int id, FontInstance *fi) {
   return bp;
 }
 
+void normalize_panel_position(MyState *s, TextPanel *tp, FontInstance *fi,
+                              TextPanel *text_last_panel, int width, int relative_x) {
+  if (tp == NULL || fi == NULL) {
+    return;
+  }
+  if (text_last_panel != NULL) {
+    TextPanel *last_panel = text_last_panel;
+    tp->position.x =
+        last_panel->position.x + last_panel->dimension.x + PANEL_OVERFLOW;
+    if (last_panel->position.x + last_panel->dimension.x + PANEL_OVERFLOW +
+            fi->textSurface->w + tp->position.x >
+        width) {
+
+      tp->position.y =
+          last_panel->position.y + fi->textSurface->h + PANEL_OVERFLOW;
+      tp->position.x = relative_x;
+    }
+  }
+}
+
 TextPanel *create_new_panel(GameInstance *gi, MyState *s, char *name,
                             int index) {
   RGBA rgba = {255, 255, 255, 255};
@@ -87,17 +107,8 @@ TextPanel *create_new_panel(GameInstance *gi, MyState *s, char *name,
     return NULL;
   }
   if (index > 0) {
-    TextPanel last_panel = s->panel.button_panel[index - 1];
-    bp->position.x =
-        last_panel.position.x + last_panel.dimension.x + PANEL_OVERFLOW;
-    if (last_panel.position.x + last_panel.dimension.x + PANEL_OVERFLOW +
-            fi->textSurface->w + bp->position.x >
-        WIN_WIDTH) {
-
-      bp->position.y =
-          last_panel.position.y + fi->textSurface->h + PANEL_OVERFLOW;
-      bp->position.x = 0;
-    }
+    normalize_panel_position(s, bp, fi, &s->panel.button_panel[index - 1],
+                             WIN_WIDTH, 0);
   }
   return bp;
 }

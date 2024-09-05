@@ -3,6 +3,54 @@
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 #include <assert.h>
+#include <string.h>
+void arr_append_space(char **current_str, MyArray *arr, int k) {
+  char *current = *current_str;
+  current = alloc_r(current, k + sizeof(char));
+  current[k] = '\0';
+  int c_size = strlen(current);
+  if (c_size > 0) {
+    push_back(arr, (char *)current, c_size + 1, "");
+    char *space = " ";
+    push_back(arr, space, strlen(space) + 1, "");
+  }
+}
+
+MyArray *split_text(char *text) { //, bool(cb_split)(char *c)) {
+  MyArray *split_arr = new_array();
+  char *current = NULL;
+  int k = 0;
+  size_t current_size = strlen(text);
+  for (int i = 0; i < current_size; i++) {
+    char c = text[i];
+    int is_space = (int)c == 32;
+    if (is_space) {
+      if (current == NULL) {
+        char *space = " ";
+        push_back(split_arr, space, strlen(space) + 1, "");
+        continue;
+      }
+      arr_append_space(&current, split_arr, k);
+      current = NULL;
+      k = 0;
+    } else {
+      current = !is_allocated(current)
+                    ? alloc(sizeof(char))
+                    : alloc_r(current, strlen(current) + sizeof(char));
+      current[k++] = c;
+    }
+  }
+  if (current != NULL) {
+    current = alloc_r(current, k + sizeof(char));
+    current[k] = '\0';
+    int c_size = strlen(current);
+    if (c_size > 0) {
+      push_back(split_arr, (char *)current, c_size + 1, "");
+      current = NULL;
+    }
+  }
+  return split_arr;
+}
 void update_keystroke(char *k, char **d) {
   char *destination = *d;
   bool is_backspace = (int)*k == KEYSTROKE_BACKSPACE;

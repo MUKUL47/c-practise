@@ -38,13 +38,7 @@ void on_mouse_update_quad_select_entity(GameInstance *gi, MyState *s,
       s->active_selected_quad > 0) {
     MouseMovement *mouse_movement = &s->select_state.mouse_movement;
     if (*mouse_movement == MOUSE_DOWN) {
-      Square *sq =
-          (Square *)get_arr(s->squares, s->active_selected_quad - 1)->value;
-      Coordinate *active_coordinate = &s->select_state.active_coordinate;
-      sq->rect->x = active_coordinate->x;
-      sq->rect->y = active_coordinate->y;
-      sq->text_panel->position.x = sq->rect->x;
-      sq->text_panel->position.y = sq->rect->y;
+      invoke_event_cb(gi, s, ENTITY_EVENT_QUAD_POSITION_UPDATE, NULL);
     }
   }
 }

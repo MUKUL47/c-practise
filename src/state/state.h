@@ -15,7 +15,6 @@
 typedef enum { NONE, MOUSE_DOWN, MOUSE_UP } MouseMovement;
 typedef enum { SQUARE_QUAD } SUPPORTED_QUAD_TYPES;
 typedef enum { BUTTON_PANEL_QUAD, BUTTON_PANEL_SELECT } BUTTON_PANEL_TYPES;
-/////////////
 
 typedef struct {
   Coordinate start_coordinate;
@@ -23,8 +22,6 @@ typedef struct {
   SDL_Rect active_select;
   MouseMovement mouse_movement;
 } SelectState;
-
-/////////////
 
 typedef struct {
   Coordinate position;
@@ -46,18 +43,15 @@ typedef struct {
   int panel_max_height;
 } Panel;
 
-/////////////
-
 typedef struct {
   Coordinate position;
   Coordinate dimension;
   int id;
   SDL_Rect *rect;
   char *description;
+  MyArray *text_panels;
   TextPanel *text_panel;
 } Square;
-
-////
 
 typedef struct {
   SDL_Renderer *renderer;
