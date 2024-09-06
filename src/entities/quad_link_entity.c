@@ -90,16 +90,15 @@ void entity_event_cb_quad_link_entity(char *k, GameInstance *gi, MyState *state,
                                       void *g) {
   int is_link_panel = state->panel.active_panel_id != 3;
   ENTITY_EVENT_TYPES e = event_type_from_char(k);
-  if (e == ENTITY_EVENT_DELETE_QUAD && is_allocated(g)) {
+  if (e == ENTITY_EVENT_UNLINK_QUAD && is_allocated(g)) {
     int deleted_quad_id = *((int *)g);
-    for (int i = 0;
-         i < state->squares->size && i != state->active_selected_quad; i++) {
+    for (int i = 0; i < state->squares->size; i++) {
       int delete_id = -1;
       Square *quad = (Square *)get_arr(state->squares, i)->value;
-    a:
       for (int j = 0; j < quad->quad_links->size; j++) {
         QuadLink *link = (QuadLink *)get_arr(quad->quad_links, j)->value;
         if (link->destination_id == deleted_quad_id) {
+          delete_id = j;
           break;
         }
       }
@@ -147,6 +146,20 @@ void entity_event_cb_quad_link_entity(char *k, GameInstance *gi, MyState *state,
       return;
     }
     Square *quad = (Square *)get_arr(state->squares, target_idx)->value;
+    for (int j = 0; j < quad->quad_links->size; j++) {
+      QuadLink *link = (QuadLink *)get_arr(quad->quad_links, j)->value;
+      if (link->destination == prev_quad->rect) {
+        delete_arr(prev_quad->quad_links, prev_quad->quad_links->size - 1);
+        return;
+      }
+    }
+    for (int j = 0; j < prev_quad->quad_links->size; j++) {
+      QuadLink *link = (QuadLink *)get_arr(prev_quad->quad_links, j)->value;
+      if (link->destination == quad->rect) {
+        delete_arr(prev_quad->quad_links, prev_quad->quad_links->size - 1);
+        return;
+      }
+    }
     update_active_selected_quad(state, quad);
     update_quad_link(prev_quad, state, quad);
   }
@@ -156,7 +169,7 @@ void init_quad_link_entity(GameInstance *gi, MyState *state) {
                     entity_event_cb_quad_link_entity);
   register_event_cb(gi, ENTITY_EVENT_MOUSE_KEYUP,
                     entity_event_cb_quad_link_entity);
-  register_event_cb(gi, ENTITY_EVENT_DELETE_QUAD,
+  register_event_cb(gi, ENTITY_EVENT_UNLINK_QUAD,
                     entity_event_cb_quad_link_entity);
 }
 void render_quad_link_entity(SDL_Renderer *renderer, MyState *state) {}

@@ -110,7 +110,12 @@ void entity_event_cb_quad_square_entity(char *k, GameInstance *gi,
                                         MyState *state, void *g) {
   ENTITY_EVENT_TYPES e = event_type_from_char(k);
   if (e == ENTITY_EVENT_DELETE_QUAD && is_allocated(g)) {
+    int delete_idx = *((int *)g);
+    assert(delete_idx > -1);
+    Square *q = (Square *)get_arr(state->squares, delete_idx)->value;
+    int deleted_id = q->id;
     delete_arr(state->squares, *((int *)g)); // bug
+    invoke_event_cb(gi, state, ENTITY_EVENT_UNLINK_QUAD, &deleted_id);
   } else if (e == ENTITY_EVENT_ON_KEYSTROKE && is_allocated(g)) {
     Square *active_quad = get_active_quad(state);
     if (!is_allocated(active_quad)) {
