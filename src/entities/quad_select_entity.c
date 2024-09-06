@@ -41,7 +41,7 @@ void on_mouse_update_quad_select_entity(GameInstance *gi, MyState *s,
         update_active_selected_quad(s, sq);
       }
     }
-    if (delete_idx > -1) {
+    if (delete_idx > -1 && s->panel.active_panel_id == 2) {
       invoke_event_cb(gi, s, ENTITY_EVENT_DELETE_QUAD, &delete_idx);
     }
   }
