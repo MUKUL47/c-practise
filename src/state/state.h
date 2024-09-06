@@ -5,8 +5,8 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_ttf.h>
-#define WIN_HEIGHT 1000
-#define WIN_WIDTH 1000
+#define WIN_HEIGHT 600
+#define WIN_WIDTH 600
 #define KEYSTROKE_BACKSPACE 8
 
 #define BUTTON_PANEL_LENGTH 3
@@ -46,6 +46,13 @@ typedef struct {
 } Panel;
 
 typedef struct {
+  SDL_Rect *source;
+  Coordinate *source_coordinate;
+  SDL_Rect *destination;
+  Coordinate *inactive_destination;
+} QuadLink;
+
+typedef struct {
   Coordinate position;
   Coordinate dimension;
   int id;
@@ -53,6 +60,7 @@ typedef struct {
   char *description;
   MyArray *text_panels;
   TextPanel *text_panel;
+  MyArray *quad_links;
 } Square;
 
 typedef struct {
@@ -67,4 +75,5 @@ typedef struct {
   SDLInstance sdl_instance;
   MyArray *squares;
   int active_selected_quad;
+  int previous_active_selected_quad;
 } MyState;

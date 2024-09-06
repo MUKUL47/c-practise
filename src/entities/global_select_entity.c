@@ -15,14 +15,13 @@ void on_mouse_update_select(GameInstance *gi, MyState *s, SDL_Event *event) {
       *start_coordinate =
           new_coords(active_coordinate->x, active_coordinate->y);
     } else if (event->type == SDL_MOUSEBUTTONUP) {
-
       *mouse_movement = MOUSE_UP;
     }
   }
 }
 
 void on_entity_render_select(SDL_Renderer *renderer, MyState *s) {
-  if (s->panel.active_panel_id == 2) {
+  if (s->panel.active_panel_id == 2 || s->panel.active_panel_id == 3) {
     return;
   }
   SelectState *select_state = &s->select_state;

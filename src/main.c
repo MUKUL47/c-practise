@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
   GameInstance *gi = new_game();
   state.sdl_instance.renderer = renderer;
   state.sdl_instance.window = window;
+  add_entity(gi, quad_link_entity_new());
   add_entity(gi, button_panel_entity());
   add_entity(gi, square_entity_new());
   add_entity(gi, global_select_entity_new());

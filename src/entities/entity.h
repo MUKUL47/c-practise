@@ -33,6 +33,7 @@ Entity *global_select_entity_new();
 Entity *square_entity_new();
 Entity *quad_select_entity_new();
 Entity *keyboard_event_listener_entity_new();
+Entity *quad_link_entity_new();
 
 // event types
 typedef enum {
