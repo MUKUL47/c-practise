@@ -13,6 +13,8 @@ const char *char_from_event_type(ENTITY_EVENT_TYPES e) {
     return "ENTITY_EVENT_ON_KEYSTROKE";
   case ENTITY_EVENT_QUAD_POSITION_UPDATE:
     return "ENTITY_EVENT_QUAD_POSITION_UPDATE";
+  case ENTITY_EVENT_UPDATE_QUAD_DIMENSION:
+    return "ENTITY_EVENT_UPDATE_QUAD_DIMENSION";
   default:
     return "ENTITY_EVENT_UNKNOWN";
   }
@@ -27,6 +29,8 @@ ENTITY_EVENT_TYPES event_type_from_char(const char *e) {
     return ENTITY_EVENT_ON_KEYSTROKE;
   } else if (strcmp(e, "ENTITY_EVENT_QUAD_POSITION_UPDATE") == 0) {
     return ENTITY_EVENT_QUAD_POSITION_UPDATE;
+  } else if (strcmp(e, "ENTITY_EVENT_UPDATE_QUAD_DIMENSION") == 0) {
+    return ENTITY_EVENT_UPDATE_QUAD_DIMENSION;
   }
   return ENTITY_EVENT_UNKNOWN;
 }

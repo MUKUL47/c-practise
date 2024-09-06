@@ -71,7 +71,7 @@ void on_entity_render_square(SDL_Renderer *renderer, MyState *s) {
   }
 }
 void update_quad_panels(Square *active_quad, MyState *state) {
-  if(!is_allocated(active_quad->description)){
+  if (!is_allocated(active_quad->description)) {
     return;
   }
   arr_destroy(active_quad->text_panels);
@@ -107,9 +107,9 @@ void update_quad_panels(Square *active_quad, MyState *state) {
 void entity_event_cb_quad_square_entity(char *k, GameInstance *gi,
                                         MyState *state, void *g) {
   ENTITY_EVENT_TYPES e = event_type_from_char(k);
-  if (e == ENTITY_EVENT_DELETE_QUAD && g != NULL) {
+  if (e == ENTITY_EVENT_DELETE_QUAD && is_allocated(g)) {
     delete_arr(state->squares, *((int *)g)); // bug
-  } else if (e == ENTITY_EVENT_ON_KEYSTROKE && g != NULL) {
+  } else if (e == ENTITY_EVENT_ON_KEYSTROKE && is_allocated(g)) {
     Square *active_quad = get_active_quad(state);
     if (!is_allocated(active_quad)) {
       return;
@@ -125,6 +125,19 @@ void entity_event_cb_quad_square_entity(char *k, GameInstance *gi,
     active_quad->rect->x = active_coordinate->x;
     active_quad->rect->y = active_coordinate->y;
     update_quad_panels(active_quad, state);
+  } else if (e == ENTITY_EVENT_UPDATE_QUAD_DIMENSION && is_allocated(g)) {
+    Square *active_quad = get_active_quad(state);
+    if (!is_allocated(active_quad)) {
+      return;
+    }
+    int dir = *(int *)g;
+    if (state->select_state.is_lcontrol_key_active) {
+      active_quad->rect->w += dir * 5;
+    }
+    if (state->select_state.is_lshift_key_active) {
+      active_quad->rect->h += dir * 5;
+    }
+    update_quad_panels(active_quad, state);
   }
 }
 
@@ -134,6 +147,8 @@ void square_entity_init(GameInstance *gi, MyState *state) {
   register_event_cb(gi, ENTITY_EVENT_ON_KEYSTROKE,
                     entity_event_cb_quad_square_entity);
   register_event_cb(gi, ENTITY_EVENT_QUAD_POSITION_UPDATE,
+                    entity_event_cb_quad_square_entity);
+  register_event_cb(gi, ENTITY_EVENT_UPDATE_QUAD_DIMENSION,
                     entity_event_cb_quad_square_entity);
   state->squares = NULL;
   state->squares = new_array();

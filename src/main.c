@@ -62,6 +62,7 @@ int main(int argc, char *argv[]) {
   create_event(gi, ENTITY_EVENT_DELETE_QUAD);
   create_event(gi, ENTITY_EVENT_ON_KEYSTROKE);
   create_event(gi, ENTITY_EVENT_QUAD_POSITION_UPDATE);
+  create_event(gi, ENTITY_EVENT_UPDATE_QUAD_DIMENSION);
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
     return 1;

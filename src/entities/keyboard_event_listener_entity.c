@@ -1,5 +1,6 @@
 #include "object_entity.h"
 #include <SDL2/SDL_events.h>
+#include <SDL2/SDL_keycode.h>
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 #include <assert.h>
@@ -73,10 +74,33 @@ void update_keystroke(char *k, char **d) {
     (*d)[current_length + 1] = '\0';
   }
 }
+
+void update_active_keystroke(int v, bool k, int *target) {
+  if (k) {
+    *target = v;
+  }
+}
 void on_mouse_update_keyboard_event_listener(GameInstance *gi, MyState *s,
                                              SDL_Event *event) {
+  SDL_Keycode keysm = event->key.keysym.sym;
+  SelectState *select_s = &s->select_state;
   if (event->type == SDL_KEYDOWN) {
-    invoke_event_cb(gi, s, ENTITY_EVENT_ON_KEYSTROKE, &event->key.keysym.sym);
+    update_active_keystroke(1, SDLK_LCTRL == keysm,
+                            &select_s->is_lcontrol_key_active);
+    update_active_keystroke(1, SDLK_LSHIFT == keysm,
+                            &select_s->is_lshift_key_active);
+    if (SDLK_LSHIFT != keysm && SDLK_LCTRL != keysm) {
+      invoke_event_cb(gi, s, ENTITY_EVENT_ON_KEYSTROKE, &keysm);
+    }
+  } else if (event->type == SDL_KEYUP) {
+    update_active_keystroke(0, SDLK_LCTRL == keysm,
+                            &select_s->is_lcontrol_key_active);
+    update_active_keystroke(0, SDLK_LSHIFT == keysm,
+                            &select_s->is_lshift_key_active);
+  } else if (event->type == SDL_MOUSEWHEEL &&
+                 select_s->is_lcontrol_key_active ||
+             event->type == SDL_MOUSEWHEEL && select_s->is_lshift_key_active) {
+    invoke_event_cb(gi, s, ENTITY_EVENT_UPDATE_QUAD_DIMENSION, &event->wheel.y);
   }
 }
 
