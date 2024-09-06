@@ -71,6 +71,9 @@ void on_entity_render_square(SDL_Renderer *renderer, MyState *s) {
   }
 }
 void update_quad_panels(Square *active_quad, MyState *state) {
+  if(!is_allocated(active_quad->description)){
+    return;
+  }
   arr_destroy(active_quad->text_panels);
   active_quad->text_panels = NULL;
   active_quad->text_panels = new_array();
