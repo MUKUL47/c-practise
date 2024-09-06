@@ -35,7 +35,7 @@ void on_mouse_update_square(GameInstance *gi, MyState *s, SDL_Event *event) {
       sq->text_panel = new_text_panel_instance(
           s, 1, new_font_instance(s, " ", new_rgba(0, 255, 0, 255)));
       sq->rect = alloc(sizeof(SDL_Rect));
-      sq->id = s->squares->size + 1;
+      sq->id = s->squares->size + 5;
       if (active_coordinate->y < s->panel.panel_max_height) {
         return;
       }
@@ -130,6 +130,8 @@ void entity_event_cb_quad_square_entity(char *k, GameInstance *gi,
     Coordinate *active_coordinate = &state->select_state.active_coordinate;
     active_quad->rect->x = active_coordinate->x;
     active_quad->rect->y = active_coordinate->y;
+    active_quad->position.x = active_coordinate->x;
+    active_quad->position.y = active_coordinate->y;
     update_quad_panels(active_quad, state);
   } else if (e == ENTITY_EVENT_UPDATE_QUAD_DIMENSION && is_allocated(g)) {
     Square *active_quad = get_active_quad(state);

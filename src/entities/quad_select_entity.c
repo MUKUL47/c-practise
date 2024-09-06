@@ -2,9 +2,23 @@
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_rect.h>
 #include <assert.h>
+
 bool is_cursor_on_quad(int mouseX, int mouseY, SDL_Rect *quad) {
-  return mouseX >= quad->x && mouseX <= quad->x + quad->w &&
-         mouseY >= quad->y && mouseY <= quad->y + quad->h;
+  return mouseX > quad->x && mouseX < (quad->x + quad->w) && mouseY > quad->y &&
+         mouseY < (quad->y + quad->h);
+}
+int get_quad_on_active_cursor(MyState *s, int x, int y) {
+  for (int i = s->squares->size - 1; i > -1; i--) {
+    Square *sq = (Square *)get_arr(s->squares, i)->value;
+    SDL_Rect *quad = (SDL_Rect *)sq->rect;
+    if (is_cursor_on_quad(x, y, quad)) {
+      return i;
+    }
+  }
+  return -1;
+}
+void update_active_selected_quad(MyState *s, Square *sq) {
+  s->active_selected_quad = is_allocated(sq) ? sq->id : 0;
 }
 void on_mouse_update_quad_select_entity(GameInstance *gi, MyState *s,
                                         SDL_Event *event) {
@@ -18,20 +32,13 @@ void on_mouse_update_quad_select_entity(GameInstance *gi, MyState *s,
     int mouseX = event->button.x;
     int mouseY = event->button.y;
     int delete_idx = -1;
-    for (int i = s->squares->size - 1; i > -1; i--) {
+    int i = get_quad_on_active_cursor(s, mouseX, mouseY);
+    if (i > -1) {
       Square *sq = (Square *)get_arr(s->squares, i)->value;
-      SDL_Rect *quad = (SDL_Rect *)sq->rect;
-      TextPanel bp = s->panel.button_panel[i];
-      SDL_Surface *surface = bp.sdl_surface;
-      SDL_Texture *texture = bp.sdl_texture;
-      if (is_cursor_on_quad(mouseX, mouseY, quad)) {
-        if (event->button.button == 3) {
-          delete_idx = i;
-        } else if (event->button.button == 1) {
-          s->previous_active_selected_quad = s->active_selected_quad;
-          s->active_selected_quad = sq->id;
-        }
-        break;
+      if (event->button.button == 3) {
+        delete_idx = i;
+      } else if (event->button.button == 1) {
+        update_active_selected_quad(s, sq);
       }
     }
     if (delete_idx > -1) {
@@ -56,7 +63,6 @@ void entity_event_cb_quad_select_entity(char *k, GameInstance *gi,
   if (e == ENTITY_EVENT_BUTTON_CLICK) {
     if (state->panel.active_panel_id != 2) {
       state->active_selected_quad = 0;
-      state->previous_active_selected_quad = 0;
     }
   }
 }

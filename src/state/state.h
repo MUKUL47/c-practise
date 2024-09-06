@@ -50,6 +50,7 @@ typedef struct {
   Coordinate *source_coordinate;
   SDL_Rect *destination;
   Coordinate *inactive_destination;
+  int destination_id;
 } QuadLink;
 
 typedef struct {
@@ -75,5 +76,4 @@ typedef struct {
   SDLInstance sdl_instance;
   MyArray *squares;
   int active_selected_quad;
-  int previous_active_selected_quad;
 } MyState;
