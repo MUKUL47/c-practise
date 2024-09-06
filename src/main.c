@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
   GameInstance *gi = new_game();
   state.sdl_instance.renderer = renderer;
   state.sdl_instance.window = window;
+  add_entity(gi, quad_link_entity_new());
   add_entity(gi, button_panel_entity());
   add_entity(gi, square_entity_new());
   add_entity(gi, global_select_entity_new());
@@ -62,6 +63,9 @@ int main(int argc, char *argv[]) {
   create_event(gi, ENTITY_EVENT_DELETE_QUAD);
   create_event(gi, ENTITY_EVENT_ON_KEYSTROKE);
   create_event(gi, ENTITY_EVENT_QUAD_POSITION_UPDATE);
+  create_event(gi, ENTITY_EVENT_UPDATE_QUAD_DIMENSION);
+  create_event(gi, ENTITY_EVENT_MOUSE_KEYUP);
+  create_event(gi, ENTITY_EVENT_UNLINK_QUAD);
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
     return 1;

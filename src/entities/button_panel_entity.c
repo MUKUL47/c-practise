@@ -4,7 +4,7 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <assert.h>
-#define PANEL_OVERFLOW 10
+#define PANEL_OVERFLOW 20
 void on_mouse_update_button_panel(GameInstance *gi, MyState *s,
                                   SDL_Event *event) {
   if (event->type == SDL_MOUSEBUTTONDOWN) {

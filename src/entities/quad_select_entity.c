@@ -2,9 +2,27 @@
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_rect.h>
 #include <assert.h>
+
+bool is_cursor_on_quad(int mouseX, int mouseY, SDL_Rect *quad) {
+  return mouseX > quad->x && mouseX < (quad->x + quad->w) && mouseY > quad->y &&
+         mouseY < (quad->y + quad->h);
+}
+int get_quad_on_active_cursor(MyState *s, int x, int y) {
+  for (int i = s->squares->size - 1; i > -1; i--) {
+    Square *sq = (Square *)get_arr(s->squares, i)->value;
+    SDL_Rect *quad = (SDL_Rect *)sq->rect;
+    if (is_cursor_on_quad(x, y, quad)) {
+      return i;
+    }
+  }
+  return -1;
+}
+void update_active_selected_quad(MyState *s, Square *sq) {
+  s->active_selected_quad = is_allocated(sq) ? sq->id : 0;
+}
 void on_mouse_update_quad_select_entity(GameInstance *gi, MyState *s,
                                         SDL_Event *event) {
-  if (s->panel.active_panel_id != 2) {
+  if (s->panel.active_panel_id != 2 && s->panel.active_panel_id != 3) {
     return;
   }
   Coordinate *active_coordinate = &s->select_state.active_coordinate;
@@ -14,31 +32,25 @@ void on_mouse_update_quad_select_entity(GameInstance *gi, MyState *s,
     int mouseX = event->button.x;
     int mouseY = event->button.y;
     int delete_idx = -1;
-    for (int i = s->squares->size - 1; i > -1; i--) {
+    int i = get_quad_on_active_cursor(s, mouseX, mouseY);
+    if (i > -1) {
       Square *sq = (Square *)get_arr(s->squares, i)->value;
-      SDL_Rect *quad = (SDL_Rect *)sq->rect;
-      TextPanel bp = s->panel.button_panel[i];
-      SDL_Surface *surface = bp.sdl_surface;
-      SDL_Texture *texture = bp.sdl_texture;
-      if (mouseX >= quad->x && mouseX <= quad->x + quad->w &&
-          mouseY >= quad->y && mouseY <= quad->y + quad->h) {
-        if (event->button.button == 3) {
-          delete_idx = i;
-        } else if (event->button.button == 1) {
-          s->active_selected_quad = sq->id;
-        }
-        break;
+      if (event->button.button == 3) {
+        delete_idx = i;
+      } else if (event->button.button == 1) {
+        update_active_selected_quad(s, sq);
       }
     }
-    if (delete_idx > -1) {
+    if (delete_idx > -1 && s->panel.active_panel_id == 2) {
       invoke_event_cb(gi, s, ENTITY_EVENT_DELETE_QUAD, &delete_idx);
     }
   }
+  int is_link = s->panel.active_panel_id == 3;
   if (event->type == SDL_MOUSEMOTION && event->button.button == 1 &&
       s->active_selected_quad > 0) {
     MouseMovement *mouse_movement = &s->select_state.mouse_movement;
     if (*mouse_movement == MOUSE_DOWN) {
-      invoke_event_cb(gi, s, ENTITY_EVENT_QUAD_POSITION_UPDATE, NULL);
+      invoke_event_cb(gi, s, ENTITY_EVENT_QUAD_POSITION_UPDATE, &is_link);
     }
   }
 }

@@ -33,6 +33,7 @@ Entity *global_select_entity_new();
 Entity *square_entity_new();
 Entity *quad_select_entity_new();
 Entity *keyboard_event_listener_entity_new();
+Entity *quad_link_entity_new();
 
 // event types
 typedef enum {
@@ -40,6 +41,9 @@ typedef enum {
   ENTITY_EVENT_ON_KEYSTROKE,
   ENTITY_EVENT_DELETE_QUAD,
   ENTITY_EVENT_QUAD_POSITION_UPDATE,
+  ENTITY_EVENT_UPDATE_QUAD_DIMENSION,
+  ENTITY_EVENT_MOUSE_KEYUP,
+  ENTITY_EVENT_UNLINK_QUAD,
   ENTITY_EVENT_UNKNOWN
 } ENTITY_EVENT_TYPES;
 
@@ -51,3 +55,4 @@ void invoke_event_cb(GameInstance *gi, MyState *s, ENTITY_EVENT_TYPES event_name
 
 const char *char_from_event_type(ENTITY_EVENT_TYPES e);
 ENTITY_EVENT_TYPES event_type_from_char(const char *e);
+void update_active_selected_quad(MyState *s, Square *sq);

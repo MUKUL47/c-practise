@@ -30,11 +30,12 @@ void on_mouse_update_square(GameInstance *gi, MyState *s, SDL_Event *event) {
     if (event->type == SDL_MOUSEBUTTONUP) {
       Square *sq = alloc(sizeof(Square));
       sq->text_panels = new_array();
+      sq->quad_links = new_array();
       sq->description = NULL;
       sq->text_panel = new_text_panel_instance(
           s, 1, new_font_instance(s, " ", new_rgba(0, 255, 0, 255)));
       sq->rect = alloc(sizeof(SDL_Rect));
-      sq->id = s->squares->size + 1;
+      sq->id = s->squares->size + 5;
       if (active_coordinate->y < s->panel.panel_max_height) {
         return;
       }
@@ -67,11 +68,12 @@ void on_entity_render_square(SDL_Renderer *renderer, MyState *s) {
                                panel->dimension.x, panel->dimension.y};
         SDL_RenderCopy(renderer, texture, NULL, &renderQuad);
       }
+      render_quad_links(renderer, quad);
     }
   }
 }
 void update_quad_panels(Square *active_quad, MyState *state) {
-  if(!is_allocated(active_quad->description)){
+  if (!is_allocated(active_quad->description)) {
     return;
   }
   arr_destroy(active_quad->text_panels);
@@ -107,16 +109,25 @@ void update_quad_panels(Square *active_quad, MyState *state) {
 void entity_event_cb_quad_square_entity(char *k, GameInstance *gi,
                                         MyState *state, void *g) {
   ENTITY_EVENT_TYPES e = event_type_from_char(k);
-  if (e == ENTITY_EVENT_DELETE_QUAD && g != NULL) {
+  if (e == ENTITY_EVENT_DELETE_QUAD && is_allocated(g)) {
+    int delete_idx = *((int *)g);
+    assert(delete_idx > -1);
+    Square *q = (Square *)get_arr(state->squares, delete_idx)->value;
+    int deleted_id = q->id;
     delete_arr(state->squares, *((int *)g)); // bug
-  } else if (e == ENTITY_EVENT_ON_KEYSTROKE && g != NULL) {
+    invoke_event_cb(gi, state, ENTITY_EVENT_UNLINK_QUAD, &deleted_id);
+  } else if (e == ENTITY_EVENT_ON_KEYSTROKE && is_allocated(g)) {
     Square *active_quad = get_active_quad(state);
     if (!is_allocated(active_quad)) {
       return;
     }
     update_keystroke((char *)((SDL_Keycode *)g), &active_quad->description);
     update_quad_panels(active_quad, state);
-  } else if (e == ENTITY_EVENT_QUAD_POSITION_UPDATE) {
+  } else if (e == ENTITY_EVENT_QUAD_POSITION_UPDATE && is_allocated(g)) {
+    bool is_link = *(int *)g;
+    if (is_link) {
+      return;
+    }
     Square *active_quad = get_active_quad(state);
     if (!is_allocated(active_quad)) {
       return;
@@ -124,6 +135,21 @@ void entity_event_cb_quad_square_entity(char *k, GameInstance *gi,
     Coordinate *active_coordinate = &state->select_state.active_coordinate;
     active_quad->rect->x = active_coordinate->x;
     active_quad->rect->y = active_coordinate->y;
+    active_quad->position.x = active_coordinate->x;
+    active_quad->position.y = active_coordinate->y;
+    update_quad_panels(active_quad, state);
+  } else if (e == ENTITY_EVENT_UPDATE_QUAD_DIMENSION && is_allocated(g)) {
+    Square *active_quad = get_active_quad(state);
+    if (!is_allocated(active_quad)) {
+      return;
+    }
+    int dir = *(int *)g;
+    if (state->select_state.is_lcontrol_key_active) {
+      active_quad->rect->w += dir * 5;
+    }
+    if (state->select_state.is_lshift_key_active) {
+      active_quad->rect->h += dir * 5;
+    }
     update_quad_panels(active_quad, state);
   }
 }
@@ -134,6 +160,8 @@ void square_entity_init(GameInstance *gi, MyState *state) {
   register_event_cb(gi, ENTITY_EVENT_ON_KEYSTROKE,
                     entity_event_cb_quad_square_entity);
   register_event_cb(gi, ENTITY_EVENT_QUAD_POSITION_UPDATE,
+                    entity_event_cb_quad_square_entity);
+  register_event_cb(gi, ENTITY_EVENT_UPDATE_QUAD_DIMENSION,
                     entity_event_cb_quad_square_entity);
   state->squares = NULL;
   state->squares = new_array();
